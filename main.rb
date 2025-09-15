@@ -1,82 +1,176 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-def exempt?(name)
-  n = name.downcase
-  n.include?('book') || n.include?('chocolate') || n.include?('pill')
+require 'bigdecimal'
+
+class SalesTaxCalculator
+  BASIC_TAX_RATE = 0.10
+  IMPORT_TAX_RATE = 0.05
+  ROUNDING_FACTOR = 20
+
+  EXEMPT_KEYWORDS = %w[book chocolate pill].freeze
+
+  attr_reader :total_tax, :total_amount
+
+  def initialize
+    reset!
+  end
+
+  def calculate_receipt(items)
+    reset!
+    items.map { |item| process_item(*item) }
+  end
+
+  private
+
+  def process_item(qty, name, imported, price)
+    unit_tax = calculate_unit_tax(name, imported, price)
+    line_total = (price + unit_tax) * qty
+    
+    @total_tax += unit_tax * qty
+    @total_amount += line_total
+    
+    { qty: qty, name: name, total: line_total }
+  end
+
+  def calculate_unit_tax(name, imported, price)
+    basic_tax = exempt?(name) ? 0 : price * BASIC_TAX_RATE
+    import_tax = imported ? price * IMPORT_TAX_RATE : 0
+    round_tax(basic_tax + import_tax)
+  end
+
+  def exempt?(name)
+    name_lower = name.downcase
+    EXEMPT_KEYWORDS.any? { |keyword| name_lower.include?(keyword) }
+  end
+
+  def round_tax(tax)
+    (BigDecimal(tax.to_s) * ROUNDING_FACTOR).ceil / ROUNDING_FACTOR
+  end
+
+  def reset!
+    @total_tax = BigDecimal('0')
+    @total_amount = BigDecimal('0')
+  end
 end
 
-def imported?(item)
-  item.include?(:imported)
-end
-
-def round_tax(tax)
-  ((tax * 20).ceil) / 20
-end
-
-def process_item(qty, name, imported, price)
-  price = price.to_f
-  basic_tax = exempt?(name) ? 0.0 : price * 0.1
-  import_tax = imported == :imported ? price * 0.05 : 0.0
-
-  tax = round_tax(basic_tax + import_tax)
-  final_price = (price + tax) * qty
-
-  puts "#{qty} #{name}: #{'%.2f' % final_price}"
-
-  [tax * qty, final_price]
-end
-
-def process_receipt(inputs)
-  total_tax = 0.0
-  total = 0.0
-
-  inputs.each do |item|
-    qty, name, imported, price = item
-    tax, price_total = process_item(qty, name, imported, price)
-    total_tax += tax
-    total += price_total
+module ReceiptFormatter
+  def self.print(items, total_tax, total_amount)
+    items.each { |item| puts format_line(item) }
+    puts "Sales Taxes: %.2f" % total_tax
+    puts "Total: %.2f" % total_amount
+    puts
   end
   
-  puts "Sales Taxes: #{'%.2f' % total_tax}"
-  puts "Total: #{'%.2f' % total}"
-  puts
+  private_class_method def self.format_line(item)
+    "#{item[:qty]} #{item[:name]}: %.2f" % item[:total]
+  end
 end
 
-input1 = [
-  [2, "book", nil, 12.49],
-  [1, "music CD", nil, 14.99],
-  [1, "chocolate bar", nil, 0.85]
-]
-input2 = [
-  [1, "box of chocolates", :imported, 10.00],
-  [1, "bottle of perfume", :imported, 47.50]
-]
-input3 = [
-  [1, "bottle of perfume", :imported, 27.99],
-  [1, "bottle of perfume", nil, 18.99],
-  [1, "packet of headache pills", nil, 9.75],
-  [3, "boxes of chocolates", :imported, 11.25]
-]
+class SalesTaxApp
+  EXAMPLES = [
+    [
+      [2, "book", false, 12.49],
+      [1, "music CD", false, 14.99],
+      [1, "chocolate bar", false, 0.85]
+    ],
+    [
+      [1, "box of chocolates", true, 10.00],
+      [1, "bottle of perfume", true, 47.50]
+    ],
+    [
+      [1, "bottle of perfume", true, 27.99],
+      [1, "bottle of perfume", false, 18.99],
+      [1, "packet of headache pills", false, 9.75],
+      [3, "boxes of chocolates", true, 11.25]
+    ]
+  ].freeze
 
-3.times do |i|
-  process_receipt(eval("input#{i + 1}"))
+  def initialize
+    @calculator = SalesTaxCalculator.new
+    @cart = []
+  end
+
+  def run
+    loop do
+      show_menu
+      choice = gets.chomp.to_i
+
+      case choice
+      when 1 then run_test_examples
+      when 2 then add_items
+      when 3 then generate_receipt
+      when 4 then break
+      else puts "Invalid option!"
+      end
+    end
+  end
+
+  private
+
+  def show_menu
+    puts "\nSales Tax Calculator"
+    puts "1. Run test examples"
+    puts "2. Add items"
+    puts "3. Generate receipt"
+    puts "4. Exit"
+    print "Choose option: "
+  end
+
+  def run_test_examples
+    EXAMPLES.each_with_index do |example, index|
+      puts "\nExample #{index + 1}:"
+      items = @calculator.calculate_receipt(example)
+      ReceiptFormatter.print(items, @calculator.total_tax, @calculator.total_amount)
+    end
+  end
+
+  def add_items
+    loop do
+      puts "\nAdd Item:"
+
+      print "Quantity: "
+      qty_input = gets.chomp
+      break if qty_input.empty?
+
+      qty = qty_input.to_i
+      if qty <= 0
+        puts "Invalid quantity!"
+        next
+      end
+
+      print "Name: "
+      name = gets.chomp.strip
+      if name.empty?
+        puts "Invalid name!"
+        next
+      end
+
+      print "Imported? (y/n): "
+      imported = gets.chomp.downcase.start_with?('y')
+
+      print "Price: "
+      price = gets.chomp.to_f
+      if price < 0
+        puts "Invalid price!"
+        next
+      end
+
+      @cart << [qty, name, imported, price]
+      puts "Item added!"
+    end
+  end
+
+  def generate_receipt
+    puts "\nCart is empty!" if @cart.empty?
+
+    puts "\nYour Receipt:"
+    items = @calculator.calculate_receipt(@cart)
+    ReceiptFormatter.print(items, @calculator.total_tax, @calculator.total_amount)
+
+    @cart.clear
+    puts "Cart cleared."
+  end
 end
 
-# 2 book: 24.98
-# 1 music CD: 15.99
-# 1 chocolate bar: 0.85
-# Sales Taxes: 1.00
-# Total: 41.82
-
-# 1 box of chocolates: 10.00
-# 1 bottle of perfume: 54.50
-# Sales Taxes: 7.00
-# Total: 64.50
-
-# 1 bottle of perfume: 31.99
-# 1 bottle of perfume: 19.99
-# 1 packet of headache pills: 9.75
-# 3 boxes of chocolates: 33.75
-# Sales Taxes: 5.00
-# Total: 95.48
+SalesTaxApp.new.run if __FILE__ == $PROGRAM_NAME
