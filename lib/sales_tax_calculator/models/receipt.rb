@@ -18,8 +18,6 @@ module SalesTaxCalculator
       @line_items << LineItem.new(product: product, tax_amount: tax_amount, final_price: final_price)
       @total_sales_taxes += tax_amount
       @total_cost += final_price
-
-      nil
     end
 
     def to_s

@@ -7,9 +7,13 @@ module SalesTaxCalculator
     def parse(input_text)
       validate_input!(input_text)
 
-      input_text.strip.split("\n").map.with_index(1) do |line, line_number|
-        parse_line(line.strip, line_number)
+      products = []
+      input_text.split("\n").each_with_index do |raw_line, line_number|
+        line = raw_line.strip
+        next if line.empty?
+        products << parse_line(line, line_number + 1)
       end
+      products
     end
 
     private
