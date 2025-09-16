@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative '../lib/sales_tax_calculator'
+
+begin
+  # Read input from STDIN or file argument
+  input = if ARGV.empty?
+            $stdin.read
+          else
+            File.read(ARGV[0])
+          end
+
+  receipt = SalesTaxCalculator.generate_receipt(input)
+  puts receipt
+
+rescue SalesTaxCalculator::Error => e
+  warn "Error: #{e.message}"
+  exit 1
+rescue StandardError => e
+  warn "Unexpected error: #{e.message}"
+  exit 1
+end
