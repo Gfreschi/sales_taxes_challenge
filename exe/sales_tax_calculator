@@ -14,6 +14,9 @@ begin
   receipt = SalesTaxCalculator.generate_receipt(input)
   puts receipt
 
+rescue SalesTaxCalculator::InputParseError => e
+  warn "Parse error: #{e.message}"
+  exit 2
 rescue SalesTaxCalculator::Error => e
   warn "Error: #{e.message}"
   exit 1

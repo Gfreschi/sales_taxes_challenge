@@ -2,8 +2,9 @@
 
 module SalesTaxCalculator
   class ReceiptGenerator
-    def initialize(input_parser: InputParser.new)
+    def initialize(input_parser: InputParser.new, tax_calculator: TaxCalculator)
       @input_parser = input_parser
+      @tax_calculator = tax_calculator
     end
 
     def generate(input_text)
@@ -11,7 +12,7 @@ module SalesTaxCalculator
       receipt = Receipt.new
 
       products.each do |product|
-        tax_amount = TaxPolicy.calculate_tax_for(product)
+        tax_amount = @tax_calculator.calculate_for(product)
         receipt.add_item(product: product, tax_amount: tax_amount)
       end
 

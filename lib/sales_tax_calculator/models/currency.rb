@@ -10,25 +10,31 @@ module SalesTaxCalculator
     attr_reader :cents
 
     def initialize(amount)
-      @cents = (BigDecimal(amount.to_s) * 100).to_i
+      decimal = BigDecimal(amount.to_s)
+      @cents = (decimal * 100).round(0, BigDecimal::ROUND_HALF_UP).to_i
       freeze
     end
 
     def +(other)
-      self.class.new((@cents + other.cents) / 100.0)
+      self.class.from_cents(@cents + other.cents)
     end
 
     def *(factor)
-      self.class.new(@cents * factor / 100.0)
+      if factor.is_a?(Integer)
+        self.class.from_cents(@cents * factor)
+      else
+        scaled = BigDecimal(@cents) * BigDecimal(factor.to_s)
+        self.class.from_cents(scaled.to_i)
+      end
     end
 
     def round_up
-      amount_cents = (@cents.to_f / 5).ceil * 5
-      self.class.new(amount_cents / 100.0)
+      amount_cents = ((@cents + 4) / 5) * 5
+      self.class.from_cents(amount_cents)
     end
 
     def to_s
-      format("%.2f", @cents / 100.0)
+      format('%.2f', @cents / 100.0)
     end
 
     def <=>(other)
@@ -38,6 +44,15 @@ module SalesTaxCalculator
 
     def zero?
       @cents.zero?
+    end
+
+    private
+
+    def self.from_cents(cents)
+      obj = allocate
+      obj.instance_variable_set(:@cents, cents.to_i)
+      obj.freeze
+      obj
     end
   end
 end

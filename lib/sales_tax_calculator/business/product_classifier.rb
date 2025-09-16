@@ -2,19 +2,21 @@
 
 module SalesTaxCalculator
   class ProductClassifier
-    EXEMPT_CATEGORIES = %w[
-      book books
-      chocolate chocolates candy food bar
-      pills medicine medical tablet tablets
+    EXEMPT_PATTERNS = [
+      /\bbook(s)?\b/i,
+      /\bchocolate bar\b/i,
+      /\b(box|boxes) of chocolates\b/i,
+      /\bchocolate(s)?\b/i,
+      /\b(pill|pills|tablet|tablets)\b/i,
+      /\b(headache|medicine|medical)\b/i
     ].freeze
 
     def self.imported?(product_name)
-      product_name.downcase.include?('imported')
+      /\bimported\b/i.match?(product_name)
     end
 
     def self.tax_exempt?(product_name)
-      name_downcase = product_name.downcase
-      EXEMPT_CATEGORIES.any? { |category| name_downcase.include?(category) }
+      EXEMPT_PATTERNS.any? { |rx| rx.match?(product_name) }
     end
   end
 end
