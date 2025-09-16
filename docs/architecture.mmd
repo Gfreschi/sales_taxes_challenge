@@ -1,0 +1,26 @@
+flowchart LR
+    A[📄 Input] --> B[📝 Parser]
+    B --> C{🔍 Classify}
+
+    C --> D[❌ Exempt<br/>0%]
+    C --> E[💰 Basic<br/>10%]
+    C --> F[🚢 Import<br/>+5%]
+
+    D --> G[🧮 Calculate]
+    E --> G
+    F --> G
+
+    G --> H[🔄 Round<br/>↑$0.05]
+    H --> I[🧾 Receipt]
+
+    classDef input fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
+    classDef process fill:#f1f8e9,stroke:#689f38,stroke-width:2px
+    classDef decision fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef tax fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    classDef output fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px
+
+    class A input
+    class B,G,H process
+    class C decision
+    class D,E,F tax
+    class I output

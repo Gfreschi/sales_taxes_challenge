@@ -1,0 +1,98 @@
+flowchart TD
+    %% Input Layer
+    subgraph Input ["🔵 Input Layer"]
+        FileInput["📄 File Input<br/>test_data/*.txt"]
+        StdinInput["⌨️ STDIN Input<br/>Interactive"]
+        CLI["🖥️ CLI Interface<br/>exe/sales_tax_calculator"]
+    end
+
+    %% Application Layer
+    subgraph Application ["🟢 Application Layer"]
+        Parser["📝 InputParser<br/>Regex: quantity + description + price"]
+        Generator["🏭 ReceiptGenerator<br/>Orchestrates workflow"]
+    end
+
+    %% Business Logic Layer
+    subgraph Business ["🟡 Business Logic Layer"]
+        Classifier["🔍 ProductClassifier<br/>Tax Exemption Detection"]
+        Calculator["🧮 TaxCalculator<br/>Rate Application"]
+
+        %% Decision Points
+        ExemptCheck{"📚 Exempt?<br/>book/food/medical"}
+        ImportCheck{"🌍 Imported?<br/>contains 'imported'"}
+
+        %% Tax Rates
+        BasicTax["💰 Basic Tax<br/>10% rate"]
+        ImportTax["🚢 Import Duty<br/>5% rate"]
+        NoTax["✅ Tax Exempt<br/>0% rate"]
+    end
+
+    %% Domain Layer
+    subgraph Domain ["🔴 Domain Layer"]
+        Product["📦 Product<br/>Value Object<br/>Immutable"]
+        Currency["💵 Currency<br/>BigDecimal precision"]
+        Rounding["🔄 Round Up<br/>ceil to $0.05"]
+        LineItem["📋 LineItem<br/>product + tax + final price"]
+        Receipt["🧾 Receipt<br/>Aggregate totals"]
+    end
+
+    %% Output Layer
+    subgraph Output ["🟣 Output Layer"]
+        Formatter["📄 Receipt Formatter<br/>Text output"]
+        PrintOut["🖨️ Final Receipt<br/>Sales Taxes + Total"]
+    end
+
+    %% Error Handling
+    subgraph Errors ["🔴 Error Handling"]
+        ParseError["❌ InputParseError<br/>Invalid format"]
+        ValidationError["❌ ValidationError<br/>Negative values"]
+    end
+
+    %% Main Flow
+    FileInput --> CLI
+    StdinInput --> CLI
+    CLI --> Parser
+
+    Parser --> Generator
+    Parser -.-> ParseError
+
+    Generator --> Product
+    Product -.-> ValidationError
+    Product --> Classifier
+
+    Classifier --> ExemptCheck
+    ExemptCheck -->|Yes| NoTax
+    ExemptCheck -->|No| BasicTax
+
+    Classifier --> ImportCheck
+    ImportCheck -->|Yes| ImportTax
+    ImportCheck -->|No| Calculator
+
+    BasicTax --> Calculator
+    ImportTax --> Calculator
+    NoTax --> Calculator
+
+    Calculator --> Currency
+    Currency --> Rounding
+    Rounding --> LineItem
+
+    LineItem --> Receipt
+    Receipt --> Formatter
+    Formatter --> PrintOut
+
+    %% Styling
+    classDef inputStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef appStyle fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef businessStyle fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef domainStyle fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    classDef outputStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef errorStyle fill:#ffebee,stroke:#d32f2f,stroke-width:2px
+    classDef decisionStyle fill:#fff9c4,stroke:#f9a825,stroke-width:3px
+
+    class FileInput,StdinInput,CLI inputStyle
+    class Parser,Generator appStyle
+    class Classifier,Calculator,BasicTax,ImportTax,NoTax businessStyle
+    class Product,Currency,Rounding,LineItem,Receipt domainStyle
+    class Formatter,PrintOut outputStyle
+    class ParseError,ValidationError errorStyle
+    class ExemptCheck,ImportCheck decisionStyle

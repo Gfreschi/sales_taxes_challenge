@@ -1,0 +1,31 @@
+flowchart TD
+    Input[📄 Input<br/>File/STDIN] --> Parser[📝 InputParser<br/>Parse format]
+    Parser --> Classifier[🔍 ProductClassifier<br/>Detect categories]
+
+    Classifier --> Exempt{📚 Tax Exempt?<br/>book/food/medical}
+    Classifier --> Import{🌍 Imported?<br/>contains imported}
+
+    Exempt -->|Yes| NoTax[✅ 0% Tax]
+    Exempt -->|No| BasicTax[💰 10% Basic Tax]
+
+    Import -->|Yes| ImportTax[🚢 5% Import Duty]
+    Import -->|No| Calculator[🧮 TaxCalculator]
+
+    NoTax --> Calculator
+    BasicTax --> Calculator
+    ImportTax --> Calculator
+
+    Calculator --> Currency[💵 Currency<br/>BigDecimal]
+    Currency --> Round[🔄 Round Up<br/>ceil to $0.05]
+    Round --> LineItem[📋 LineItem]
+    LineItem --> Receipt[🧾 Receipt<br/>Sales Taxes + Total]
+    Receipt --> Output[🖨️ Final Receipt]
+
+    classDef inputStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef processStyle fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef decisionStyle fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    classDef outputStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+
+    class Input,Output inputStyle
+    class Parser,Classifier,Calculator,Currency,Round,LineItem,Receipt processStyle
+    class Exempt,Import decisionStyle
