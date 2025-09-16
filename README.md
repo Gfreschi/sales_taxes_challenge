@@ -1,7 +1,7 @@
 # Sales Tax Calculator
 
 [![CI](https://github.com/Gfreschi/sales_taxes_challenge/workflows/CI/badge.svg)](https://github.com/Gfreschi/sales_taxes_challenge/actions)
-[![Ruby Version](https://img.shields.io/badge/ruby-%3E%3D%202.7.0-red.svg)](https://ruby-lang.org)
+[![Ruby Version](https://img.shields.io/badge/ruby-%3E%3D%203.3.4-red.svg)](https://ruby-lang.org)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Gfreschi/sales_taxes_challenge/pulls)
 
@@ -25,7 +25,7 @@ Click above for a fully configured environment. Test with: `ruby exe/sales_tax_c
 
 ## Setup & Usage
 
-**Requirements**: Ruby 2.7.0+, Minitest for tests
+**Requirements**: Ruby >= 3.3.4, Minitest for tests
 
 ```bash
 # Setup

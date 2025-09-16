@@ -1,4 +1,4 @@
-modules = ["ruby-3.2"]
+modules = ["ruby-3.3"]
 
 [nix]
 channel = "stable-25_05"
