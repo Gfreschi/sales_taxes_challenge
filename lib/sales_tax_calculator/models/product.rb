@@ -24,9 +24,9 @@ module SalesTaxCalculator
     private
 
     def validate!
-      raise ArgumentError, "Name cannot be empty" if @name.empty?
-      raise ArgumentError, "Unit price must be positive" if @unit_price <= Currency.new(0)
-      raise ArgumentError, "Quantity must be positive" if @quantity <= 0
+      raise ArgumentError, 'Name cannot be empty' if @name.empty?
+      raise ArgumentError, 'Unit price must be positive' if @unit_price <= Currency.new(0)
+      raise ArgumentError, 'Quantity must be positive' if @quantity <= 0
     end
   end
 end

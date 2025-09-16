@@ -2,7 +2,7 @@
 
 module SalesTaxCalculator
   class InputParser
-    INPUT_PATTERN = /\A(\d+)\s+(.+?)\s+at\s+(\d+\.\d{2})\z/i.freeze
+    LINE_PATTERN = /\A(\d+)\s+(.+?)\s+at\s+(\d+\.\d{2})\z/i.freeze
 
     def parse(input_text)
       validate_input!(input_text)
@@ -19,7 +19,7 @@ module SalesTaxCalculator
     private
 
     def parse_line(line, line_number)
-      match = line.match(INPUT_PATTERN)
+      match = line.match(LINE_PATTERN)
 
       unless match
         raise InputParseError, "Invalid format at line #{line_number}: '#{line}'"

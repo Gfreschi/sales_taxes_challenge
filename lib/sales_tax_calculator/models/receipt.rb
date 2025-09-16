@@ -38,9 +38,9 @@ module SalesTaxCalculator
     private
 
     def validate_params!(product, tax_amount)
-      raise ArgumentError, "Expected Product" unless product.is_a?(Product)
-      raise ArgumentError, "Expected Currency" unless tax_amount.is_a?(Currency)
-      raise ArgumentError, "Tax cannot be negative" if tax_amount < Currency.new(0)
+      raise ArgumentError, 'Expected Product' unless product.is_a?(Product)
+      raise ArgumentError, 'Expected Currency' unless tax_amount.is_a?(Currency)
+      raise ArgumentError, 'Tax cannot be negative' if tax_amount < Currency.new(0)
     end
   end
 end

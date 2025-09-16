@@ -46,8 +46,7 @@ module SalesTaxCalculator
       @cents.zero?
     end
 
-    private
-
+    # avoid Float conversions
     def self.from_cents(cents)
       obj = allocate
       obj.instance_variable_set(:@cents, cents.to_i)
