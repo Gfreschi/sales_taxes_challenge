@@ -4,6 +4,7 @@
 require_relative "sales_tax_calculator/errors"
 require_relative "sales_tax_calculator/models/currency"
 require_relative "sales_tax_calculator/models/product"
+require_relative "sales_tax_calculator/models/line_item"
 require_relative "sales_tax_calculator/business/product_classifier"
 require_relative "sales_tax_calculator/business/tax_policy"
 require_relative "sales_tax_calculator/models/receipt"

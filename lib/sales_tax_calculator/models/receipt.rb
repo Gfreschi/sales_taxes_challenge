@@ -15,13 +15,7 @@ module SalesTaxCalculator
 
       final_price = product.total_base_price + tax_amount
 
-      line_item = {
-        product: product,
-        tax_amount: tax_amount,
-        final_price: final_price
-      }
-
-      @line_items << line_item
+      @line_items << LineItem.new(product: product, tax_amount: tax_amount, final_price: final_price)
       @total_sales_taxes += tax_amount
       @total_cost += final_price
 
@@ -31,11 +25,7 @@ module SalesTaxCalculator
     def to_s
       lines = []
 
-      @line_items.each do |item|
-        product = item[:product]
-        final_price = item[:final_price]
-        lines << "#{product.quantity} #{product.name}: #{final_price}"
-      end
+      @line_items.each { |item| lines << item.printable_line }
 
       lines << "Sales Taxes: #{@total_sales_taxes}"
       lines << "Total: #{@total_cost}"

@@ -23,7 +23,7 @@ module SalesTaxCalculator
 
       quantity = match[1].to_i
       name = match[2].strip
-      unit_price = match[3].to_f
+      unit_price = match[3]
 
       Product.new(name: name, unit_price: unit_price, quantity: quantity)
     rescue ArgumentError => e
