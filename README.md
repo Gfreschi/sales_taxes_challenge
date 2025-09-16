@@ -51,13 +51,83 @@ rake test      # Full test suite
 rake fixtures  # Validate against challenge cases
 ```
 
-✅ **All three reference test cases pass** with correct tax calculations, rounding, and receipt formatting. Test coverage includes currency precision, classification rules, and end-to-end acceptance testing.
+**All three reference test cases pass** with correct tax calculations, rounding, and receipt formatting. Test coverage includes currency precision, classification rules, and end-to-end acceptance testing.
 
-## Architecture
+## Architecture Diagram
 
 **Pipeline:** Input → Parse → Classify → Tax → Round → Receipt
 
-![Architecture Flow](https://mermaid.ink/img/Zmxvd2NoYXJ0IExSCiAgICBBW/Cfk4QgSW5wdXRdIC0tPiBCW/Cfk50gUGFyc2VyXQogICAgQiAtLT4gQ3vwn5SNIENsYXNzaWZ5fQoKICAgIEMgLS0+IERb4p2MIEV4ZW1wdDxici8+MCVdCiAgICBDIC0tPiBFW/CfkrAgQmFzaWM8YnIvPjEwJV0KICAgIEMgLS0+IEZb8J+aoiBJbXBvcnQ8YnIvPis1JV0KCiAgICBEIC0tPiBHW/Cfp64gQ2FsY3VsYXRlXQogICAgRSAtLT4gRwogICAgRiAtLT4gRwoKICAgIEcgLS0+IEhb8J+UhCBSb3VuZDxici8+4oaRJDAuMDVdCiAgICBIIC0tPiBJW/Cfp74gUmVjZWlwdF0KCiAgICBjbGFzc0RlZiBpbnB1dCBmaWxsOiNlM2YyZmQsc3Ryb2tlOiMxOTc2ZDIsc3Ryb2tlLXdpZHRoOjNweAogICAgY2xhc3NEZWYgcHJvY2VzcyBmaWxsOiNmMWY4ZTksc3Ryb2tlOiM2ODlmMzgsc3Ryb2tlLXdpZHRoOjJweAogICAgY2xhc3NEZWYgZGVjaXNpb24gZmlsbDojZmZmM2UwLHN0cm9rZTojZjU3YzAwLHN0cm9rZS13aWR0aDoycHgKICAgIGNsYXNzRGVmIHRheCBmaWxsOiNmY2U0ZWMsc3Ryb2tlOiNjMjE4NWIsc3Ryb2tlLXdpZHRoOjJweAogICAgY2xhc3NEZWYgb3V0cHV0IGZpbGw6I2YzZTVmNSxzdHJva2U6IzdiMWZhMixzdHJva2Utd2lkdGg6M3B4CgogICAgY2xhc3MgQSBpbnB1dAogICAgY2xhc3MgQixHLEggcHJvY2VzcwogICAgY2xhc3MgQyBkZWNpc2lvbgogICAgY2xhc3MgRCxFLEYgdGF4CiAgICBjbGFzcyBJIG91dHB1dA==)
+```mermaid
+%%{init: {
+  "theme": "base",
+  "flowchart": { "curve": "basis", "htmlLabels": true, "padding": 16, "wrap": true },
+  "themeVariables": {
+    "fontFamily": "Inter, Segoe UI, Roboto, Arial, sans-serif",
+    "primaryTextColor": "#0b1220",
+    "nodeTextColor": "#0b1220",
+    "lineColor": "#64748b",
+    "edgeLabelBackground": "#ffffff",
+    "fontSize": "14px",
+    "graphPadding": 16,
+    "nodeSpacing": 28,
+    "rankSpacing": 48
+  }
+}}%%
+flowchart 
+  subgraph S1["I/O & Parsing"]
+    direction LR
+    Input[📄 Input<br/>File/STDIN] --> Parser[📝 InputParser<br/>Parse format]
+  end
+
+  subgraph S2["Classification & Decisions"]
+    direction LR
+    Parser --> Classifier[🔍 ProductClassifier<br/>Detect categories]
+    Classifier --> Exempt{📚 Tax Exempt?<br/>book/food/medical}
+    Classifier --> Import{🌍 Imported?<br/>contains imported}
+  end
+
+  subgraph S3["Tax Rules & Calculation"]
+    direction LR
+    Exempt -->|Yes| NoTax[✅ 0% Tax]
+    Exempt -->|No| BasicTax[💰 10% Basic Tax]
+
+    Import -->|Yes| ImportTax[🚢 5% Import Duty]
+    Import -->|No| Calculator[🧮 TaxCalculator]
+
+    NoTax --> Calculator
+    BasicTax --> Calculator
+    ImportTax --> Calculator
+  end
+
+  subgraph S4["Currency & Rounding Strategies"]
+    direction LR
+    Calculator --> Currency[💵 Currency<br/>BigDecimal]
+    Currency --> Round[🔄 Round Up<br/>ceil to $0.05]
+  end
+
+  subgraph S5["Aggregation"]
+    direction LR
+    Round --> LineItem[📋 LineItem]
+    LineItem --> Receipt[🧾 Receipt<br/>Sales Taxes + Total]
+  end
+
+  subgraph S6["Output"]
+    direction LR
+    Receipt --> Output[🖨️ Final Receipt]
+  end
+
+  classDef inputStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px,rx:10,ry:10
+  classDef processStyle fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px,rx:10,ry:10
+  classDef decisionStyle fill:#fff9c4,stroke:#f9a825,stroke-width:3px,rx:10,ry:10
+  classDef outputStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,rx:10,ry:10
+
+  linkStyle default stroke:#64748b,stroke-width:1.6
+
+  class Input inputStyle
+  class Output outputStyle
+  class Parser,Classifier,Calculator,Currency,Round,LineItem,Receipt processStyle
+  class Exempt,Import decisionStyle
+```
 
 **Technical Decisions:**
 • **BigDecimal**: Prevents floating-point errors in monetary calculations
@@ -77,7 +147,3 @@ rake fixtures  # Validate against challenge cases
 ## License
 
 MIT License - see [LICENSE](LICENSE) file.
-
-## Reference
-
-[Original challenge specification](https://gist.github.com/safplatform/792314da6b54346594432f30d5868f36)

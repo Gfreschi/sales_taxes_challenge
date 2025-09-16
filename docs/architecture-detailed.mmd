@@ -1,6 +1,21 @@
-flowchart TD
+%%{init: {
+  "theme": "base",
+  "flowchart": { "curve": "basis", "htmlLabels": true, "wrap": true },
+  "themeVariables": {
+    "fontFamily": "Inter, Segoe UI, Roboto, Arial, sans-serif",
+    "primaryTextColor": "#0b1220",
+    "lineColor": "#64748b",
+    "edgeLabelBackground": "#ffffff",
+    "nodeTextColor": "#0b1220",
+    "graphPadding": 16,
+    "nodeSpacing": 28,
+    "rankSpacing": 48
+  }
+}}%%
+flowchart LR
     %% Input Layer
     subgraph Input ["🔵 Input Layer"]
+        direction TB
         FileInput["📄 File Input<br/>test_data/*.txt"]
         StdinInput["⌨️ STDIN Input<br/>Interactive"]
         CLI["🖥️ CLI Interface<br/>exe/sales_tax_calculator"]
@@ -8,12 +23,14 @@ flowchart TD
 
     %% Application Layer
     subgraph Application ["🟢 Application Layer"]
+        direction TB
         Parser["📝 InputParser<br/>Regex: quantity + description + price"]
         Generator["🏭 ReceiptGenerator<br/>Orchestrates workflow"]
     end
 
     %% Business Logic Layer
     subgraph Business ["🟡 Business Logic Layer"]
+        direction TB
         Classifier["🔍 ProductClassifier<br/>Tax Exemption Detection"]
         Calculator["🧮 TaxCalculator<br/>Rate Application"]
 
@@ -29,6 +46,7 @@ flowchart TD
 
     %% Domain Layer
     subgraph Domain ["🔴 Domain Layer"]
+        direction TB
         Product["📦 Product<br/>Value Object<br/>Immutable"]
         Currency["💵 Currency<br/>BigDecimal precision"]
         Rounding["🔄 Round Up<br/>ceil to $0.05"]
@@ -38,12 +56,14 @@ flowchart TD
 
     %% Output Layer
     subgraph Output ["🟣 Output Layer"]
+        direction TB
         Formatter["📄 Receipt Formatter<br/>Text output"]
         PrintOut["🖨️ Final Receipt<br/>Sales Taxes + Total"]
     end
 
     %% Error Handling
     subgraph Errors ["🔴 Error Handling"]
+        direction TB
         ParseError["❌ InputParseError<br/>Invalid format"]
         ValidationError["❌ ValidationError<br/>Negative values"]
     end
@@ -54,10 +74,10 @@ flowchart TD
     CLI --> Parser
 
     Parser --> Generator
-    Parser -.-> ParseError
+    Parser -. error .-> ParseError
 
     Generator --> Product
-    Product -.-> ValidationError
+    Product -. invalid .-> ValidationError
     Product --> Classifier
 
     Classifier --> ExemptCheck
@@ -81,13 +101,15 @@ flowchart TD
     Formatter --> PrintOut
 
     %% Styling
-    classDef inputStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    classDef appStyle fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
-    classDef businessStyle fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    classDef domainStyle fill:#fce4ec,stroke:#c2185b,stroke-width:2px
-    classDef outputStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-    classDef errorStyle fill:#ffebee,stroke:#d32f2f,stroke-width:2px
-    classDef decisionStyle fill:#fff9c4,stroke:#f9a825,stroke-width:3px
+    classDef inputStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px,rx:10,ry:10
+    classDef appStyle fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px,rx:10,ry:10
+    classDef businessStyle fill:#fff3e0,stroke:#f57c00,stroke-width:2px,rx:10,ry:10
+    classDef domainStyle fill:#fce4ec,stroke:#c2185b,stroke-width:2px,rx:10,ry:10
+    classDef outputStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,rx:10,ry:10
+    classDef errorStyle fill:#ffebee,stroke:#d32f2f,stroke-width:2px,rx:10,ry:10
+    classDef decisionStyle fill:#fff9c4,stroke:#f9a825,stroke-width:3px,rx:10,ry:10
+
+    linkStyle default stroke:#64748b,stroke-width:1.6
 
     class FileInput,StdinInput,CLI inputStyle
     class Parser,Generator appStyle
