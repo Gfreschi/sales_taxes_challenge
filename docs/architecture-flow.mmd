@@ -13,46 +13,38 @@
     "rankSpacing": 48
   }
 }}%%
-flowchart 
+flowchart LR
   subgraph S1["I/O & Parsing"]
-    direction LR
     Input[📄 Input<br/>File/STDIN] --> Parser[📝 InputParser<br/>Parse format]
   end
 
   subgraph S2["Classification & Decisions"]
-    direction LR
     Parser --> Classifier[🔍 ProductClassifier<br/>Detect categories]
     Classifier --> Exempt{📚 Tax Exempt?<br/>book/food/medical}
     Classifier --> Import{🌍 Imported?<br/>contains imported}
   end
 
   subgraph S3["Tax Rules & Calculation"]
-    direction LR
     Exempt -->|Yes| NoTax[✅ 0% Tax]
     Exempt -->|No| BasicTax[💰 10% Basic Tax]
-
     Import -->|Yes| ImportTax[🚢 5% Import Duty]
     Import -->|No| Calculator[🧮 TaxCalculator]
-
     NoTax --> Calculator
     BasicTax --> Calculator
     ImportTax --> Calculator
   end
 
   subgraph S4["Currency & Rounding Strategies"]
-    direction LR
     Calculator --> Currency[💵 Currency<br/>BigDecimal]
     Currency --> Round[🔄 Round Up<br/>ceil to $0.05]
   end
 
   subgraph S5["Aggregation"]
-    direction LR
     Round --> LineItem[📋 LineItem]
     LineItem --> Receipt[🧾 Receipt<br/>Sales Taxes + Total]
   end
 
   subgraph S6["Output"]
-    direction LR
     Receipt --> Output[🖨️ Final Receipt]
   end
 
