@@ -5,21 +5,21 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Gfreschi/sales_taxes_challenge/pulls)
 
-A Ruby application that calculates sales taxes and import duties for shopping receipts with precise decimal handling. This implementation addresses the classic Sales Tax coding challenge, applying a 10% basic sales tax with exemptions for books, food, and medical products, as well as a 5% import duty on all imported goods.
+A Ruby application that calculates sales taxes and import duties for shopping receipts. This implementation addresses the classic Sales Tax coding challenge, applying a 10% basic sales tax with exemptions for books, food, and medical products, as well as a 5% import duty on all imported goods.
 
 > Challenge reference: [HERE](https://gist.github.com/safplatform/792314da6b54346594432f30d5868f36)
 
-## 🚀 Try it Online
+## Try it Online
 
 [![Run on Repl.it](https://img.shields.io/badge/run%20on-repl.it-667881.svg)](https://replit.com/@Gfreschi/salestaxeschallenge)
 
 ## Tax Rules
 
-Basic Sales Tax: 10% on all goods except books, food, and medical products;
-Import Duty: 5% on all imported goods (no exemptions);
-Rounding: Tax amounts rounded up to the nearest $0.05;
-Calculation: Per-unit tax calculation, then multiplied by quantity;
-Classification: Case-insensitive keyword matching with word boundaries;
+- Basic Sales Tax: 10% on all goods except books, food, and medical products;
+- Import Duty: 5% on all imported goods (no exemptions);
+- Rounding: Tax amounts rounded up to the nearest $0.05;
+- Calculation: Per-unit tax calculation, then multiplied by quantity;
+- Classification: Case-insensitive keyword matching with word boundaries;
 
 ## Setup & Usage
 
@@ -120,11 +120,11 @@ flowchart LR
 ```
 
 **Technical Decisions:**
-• BigDecimal: Prevents floating-point errors in monetary calculations;
-• Strategy Pattern: TaxCalculator policies for extensible tax rules;
-• Value Objects: Immutable Currency/Product for thread safety;
-• Per-unit calculation: Tax computation before quantity multiplication;
-• Regex parsing: Strict format validation with word boundaries;
+- BigDecimal: Prevents floating-point errors in monetary calculations;
+- Strategy Pattern: TaxCalculator policies for extensible tax rules;
+- Value Objects: Immutable Currency/Product for thread safety;
+- Per-unit calculation: Tax computation before quantity multiplication;
+- Regex parsing: Strict format validation with word boundaries;
 
 ## Limitations
 
